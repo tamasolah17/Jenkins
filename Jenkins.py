@@ -40,6 +40,6 @@ def index17():
     return render_template("index17.html")
 
 if __name__== "__main__":
-    app17.run(host="0.0.0.0",port=2000)
+    app17.run(host="0.0.0.0",port=6000)
 
 
