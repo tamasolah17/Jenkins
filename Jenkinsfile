@@ -2,16 +2,19 @@ pipeline {
     agent any
 
     stages {
+
         stage('Install Dependencies') {
             steps {
-                sh 'pip install -r requirements.txt'
+                bat 'python -m pip install --upgrade pip'
+                bat 'pip install -r requirements.txt'
             }
         }
 
         stage('Run App Test') {
             steps {
-                sh 'python3 main.py'
+                bat 'python main.py'
             }
         }
+
     }
 }
