@@ -12,9 +12,22 @@ pipeline {
 
         stage('Run App Test') {
             steps {
-                bat 'python main.py'
+                bat 'python -m py_compile Jenkins.py'
             }
         }
 
+        stage('Deploy to EC2') {
+            steps {
+                bat '''
+                ssh ubuntu@YOUR_EC2_IP "
+                cd /home/ubuntu/Jenkins &&
+                git pull origin main &&
+                source venv/bin/activate &&
+                pip install -r requirements.txt &&
+                sudo systemctl restart flaskapp
+                "
+                '''
+            }
+        }
     }
 }
