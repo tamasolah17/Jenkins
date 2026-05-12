@@ -19,7 +19,7 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 bat '''
-                ssh ubuntu@YOUR_EC2_IP "
+                ssh ubuntu@13.62.225.65 "
                 cd /home/ubuntu/Jenkins &&
                 git pull origin main &&
                 source venv/bin/activate &&
