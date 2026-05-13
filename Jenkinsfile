@@ -1,23 +1,19 @@
 pipeline {
     agent any
 
-    environment {
-        VENV = "/home/ubuntu/Jenkins/venv"
-        APP_DIR = "/home/ubuntu/Jenkins"
-    }
-
     stages {
 
-        stage('Checkout') {
+        stage('Clone Check') {
             steps {
-                git branch: 'main', url: 'YOUR_GIT_REPO_URL'
+                sh 'pwd'
+                sh 'ls -la'
             }
         }
 
-        stage('Setup Python venv') {
+        stage('Install Dependencies') {
             steps {
                 sh '''
-                python3 -m venv venv || true
+                python3 -m venv venv
                 . venv/bin/activate
                 pip install --upgrade pip
                 pip install -r requirements.txt
@@ -25,7 +21,7 @@ pipeline {
             }
         }
 
-        stage('Test / Compile') {
+        stage('Run Test') {
             steps {
                 sh '''
                 . venv/bin/activate
@@ -34,7 +30,7 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Restart Flask App') {
             steps {
                 sh '''
                 sudo systemctl restart flaskapp
@@ -42,5 +38,6 @@ pipeline {
                 '''
             }
         }
+
     }
 }
