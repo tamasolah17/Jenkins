@@ -35,6 +35,9 @@ pipeline {
                     bat '''
                         ssh -o StrictHostKeyChecking=no ubuntu@13.62.225.65 "cd /home/ubuntu/Jenkins && git pull origin main && sudo systemctl restart flaskapp"
                     '''
+                }
+            }
         }
+
     }
 }
