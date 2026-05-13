@@ -1,30 +1,44 @@
 pipeline {
     agent any
 
+    environment {
+        REMOTE = "ubuntu@13.62.225.65"
+    }
+
     stages {
 
-        stage('Install Dependencies') {
+        stage('Checkout') {
             steps {
-                bat 'python -m pip install --upgrade pip'
-                bat 'pip install -r requirements.txt'
+                git branch: 'main', url: 'https://github.com/tamasolah17/Jenkins.git'
             }
         }
 
-        stage('Run App Test') {
+        stage('Install Dependencies') {
             steps {
-                bat 'python -m py_compile Jenkins.py'
+                sh '''
+                python3 -m pip install --upgrade pip
+                pip3 install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('Test / Compile') {
+            steps {
+                sh 'python3 -m py_compile Jenkins.py'
             }
         }
 
         stage('Deploy to EC2') {
             steps {
-                bat '''
-                ssh ubuntu@13.62.225.65 ^
-                "cd /home/ubuntu/Jenkins && \
-                git pull origin main && \
-                source venv/bin/activate && \
-                pip install -r requirements.txt && \
-                sudo systemctl restart flaskapp"
+                sh '''
+                ssh -o StrictHostKeyChecking=no $REMOTE << 'EOF'
+                cd /home/ubuntu/Jenkins || exit 1
+                git pull origin main
+
+                pip3 install -r requirements.txt
+
+                sudo systemctl restart flaskapp
+EOF
                 '''
             }
         }
