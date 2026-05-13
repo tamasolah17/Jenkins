@@ -14,7 +14,7 @@ pipeline {
                 bat '''
                 python -m venv venv
                 call venv\\Scripts\\activate
-                pip install --upgrade pip
+                python -m pip install --upgrade pip
                 pip install -r requirements.txt
                 '''
             }
@@ -29,7 +29,7 @@ pipeline {
             }
         }
 
-       stage('Deploy to EC2') {
+        stage('Deploy to EC2') {
             steps {
                 sshagent(['ec2-key']) {
                     bat '''
@@ -38,5 +38,6 @@ pipeline {
                     '''
                 }
             }
-       }
+        }
+    }
 }
