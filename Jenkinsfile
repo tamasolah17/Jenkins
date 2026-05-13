@@ -5,16 +5,15 @@ pipeline {
 
         stage('Clone Check') {
             steps {
-                sh 'pwd'
-                sh 'ls -la'
+                bat 'dir'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                sh '''
-                python3 -m venv venv
-                . venv/bin/activate
+                bat '''
+                python -m venv venv
+                call venv\\Scripts\\activate
                 pip install --upgrade pip
                 pip install -r requirements.txt
                 '''
@@ -23,18 +22,17 @@ pipeline {
 
         stage('Run Test') {
             steps {
-                sh '''
-                . venv/bin/activate
+                bat '''
+                call venv\\Scripts\\activate
                 python -m py_compile Jenkins.py
                 '''
             }
         }
 
-        stage('Restart Flask App') {
+        stage('Deploy to EC2') {
             steps {
-                sh '''
-                sudo systemctl restart flaskapp
-                sudo systemctl status flaskapp --no-pager
+                bat '''
+                ssh ubuntu@13.62.225.65 "cd /home/ubuntu/Jenkins && git pull origin main && sudo systemctl restart flaskapp"
                 '''
             }
         }
