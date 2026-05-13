@@ -29,14 +29,16 @@ pipeline {
             }
         }
 
-        stage('Deploy to EC2') {
+       stage('Deploy to EC2 (SSM)') {
             steps {
                 bat '''
-                ssh -i C:\\Users\\User\\.ssh\\jenkins_key ^
-                -o StrictHostKeyChecking=no ubuntu@13.62.225.65 ^
-                "cd /home/ubuntu/Jenkins && git pull origin main && sudo systemctl restart flaskapp"
+                aws ssm send-command ^
+                --instance-ids "i-xxxx" ^
+                --document-name "AWS-RunShellScript" ^
+                --parameters commands=["cd /home/ubuntu/Jenkins && git pull origin main && sudo systemctl restart flaskapp"] ^
+                --region eu-central-1
                 '''
             }
-        }
+       }
     }
 }
