@@ -2,43 +2,43 @@ pipeline {
     agent any
 
     environment {
-        REMOTE = "ubuntu@13.62.225.65"
+        VENV = "/home/ubuntu/Jenkins/venv"
+        APP_DIR = "/home/ubuntu/Jenkins"
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/tamasolah17/Jenkins.git'
+                git branch: 'main', url: 'YOUR_GIT_REPO_URL'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Setup Python venv') {
             steps {
                 sh '''
-                python3 -m pip install --upgrade pip
-                pip3 install -r requirements.txt
+                python3 -m venv venv || true
+                . venv/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
                 '''
             }
         }
 
         stage('Test / Compile') {
             steps {
-                sh 'python3 -m py_compile Jenkins.py'
+                sh '''
+                . venv/bin/activate
+                python -m py_compile Jenkins.py
+                '''
             }
         }
 
-        stage('Deploy to EC2') {
+        stage('Deploy') {
             steps {
                 sh '''
-                ssh -o StrictHostKeyChecking=no $REMOTE << 'EOF'
-                cd /home/ubuntu/Jenkins || exit 1
-                git pull origin main
-
-                pip3 install -r requirements.txt
-
                 sudo systemctl restart flaskapp
-EOF
+                sudo systemctl status flaskapp --no-pager
                 '''
             }
         }
