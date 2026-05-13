@@ -32,7 +32,8 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 bat '''
-                ssh ubuntu@13.62.225.65 "cd /home/ubuntu/Jenkins && git pull origin main && sudo systemctl restart flaskapp"
+                ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/id_ed25519 ubuntu@13.62.225.65 \
+"cd /home/ubuntu/Jenkins && git pull origin main && sudo systemctl restart flaskapp"
                 '''
             }
         }
