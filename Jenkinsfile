@@ -29,13 +29,14 @@ pipeline {
             }
         }
 
-        stage('Deploy to EC2') {
+       stage('Deploy to EC2') {
             steps {
                 bat '''
-                    ssh -o StrictHostKeyChecking=no ubuntu@13.62.225.65 "cd /home/ubuntu/Jenkins && git pull origin main && sudo systemctl restart flaskapp"
+                ssh -i C:\\Users\\User\\.ssh\\jenkins_key -o StrictHostKeyChecking=no ubuntu@13.62.225.65 ^
+                "cd /home/ubuntu/Jenkins && git pull origin main && sudo systemctl restart flaskapp"
                 '''
             }
-        }
+       }
 
     }
 }
