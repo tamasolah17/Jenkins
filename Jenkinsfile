@@ -2,11 +2,6 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
-            steps {
-                 git 'https://github.com/tamasolah17/Jenkins.git'
-            }
-        }
 
         stage('Setup Python') {
             steps {
