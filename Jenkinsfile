@@ -2,40 +2,22 @@ pipeline {
     agent any
 
     stages {
-
-        stage('Clone Check') {
+        stage('Checkout') {
             steps {
-                bat 'dir'
+                git 'https://github.com/yourusername/python-ci-project.git'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Setup Python') {
             steps {
-                bat '''
-                python -m venv venv
-                call venv\\Scripts\\activate
-                python -m pip install --upgrade pip
-                pip install -r requirements.txt
-                '''
+                sh 'python3 --version'
+                sh 'pip3 install -r requirements.txt'
             }
         }
 
-        stage('Run Test') {
+        stage('Run Tests') {
             steps {
-                bat '''
-                call venv\\Scripts\\activate
-                python -m py_compile Jenkins.py
-                '''
-            }
-        }
-
-        stage('Deploy to EC2') {
-            steps {
-                bat '''
-                ssh -i C:\\Users\\User\\.ssh\\jenkins_key ^
-                -o StrictHostKeyChecking=no ubuntu@13.62.225.65 ^
-                "cd /home/ubuntu/Jenkins && git pull origin main && sudo systemctl restart flaskapp"
-                '''
+                sh 'pytest'
             }
         }
     }
