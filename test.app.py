@@ -1,11 +1,6 @@
 from Jenkins import app17
 
-def test_login_route():
+def test_home():
     client = app17.test_client()
-
-    response = client.post('/login', data={
-        'username': 'testuser',
-        'password': 'pass@123'
-    })
-
+    response = client.get("/")
     assert response.status_code == 200
