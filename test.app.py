@@ -1,4 +1,4 @@
-from Jenkins import app17
+from app import app17
 
 def test_home():
     client = app17.test_client()
