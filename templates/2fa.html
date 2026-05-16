@@ -5,14 +5,15 @@
 </head>
 <body>
 
-<h2>Scan QR Code</h2>
+    <h2>Scan QR Code with Google Authenticator</h2>
 
-<img src="/2fa/setup" alt="QR Code">
+    <!-- QR IMAGE -->
+    <img src="{{ url_for('setup_2fa') }}" alt="QR Code">
 
-<form action="/2fa/verify" method="POST">
-    <input type="text" name="code" placeholder="Enter 6-digit code" required>
-    <button type="submit">Verify</button>
-</form>
+    <form action="/2fa/verify" method="POST">
+        <input type="text" name="code" placeholder="Enter 6-digit code">
+        <button type="submit">Verify</button>
+    </form>
 
 </body>
 </html>
