@@ -20,5 +20,26 @@ pipeline {
                 '''
             }
         }
+         stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t flask-cicd .'
+            }
+        }
+
+        stage('Deploy Container') {
+            steps {
+                sh '''
+                    docker stop flask-cicd-container || true
+                    docker rm flask-cicd-container || true
+
+                    docker run -d \
+                        --name flask-cicd-container \
+                        -p 24000:24000 \
+                        flask-cicd
+                '''
+            }
+        }
+
+
     }
 }
