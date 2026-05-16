@@ -49,7 +49,7 @@ def setup_2fa():
     return send_file(buf, mimetype="image/png")
 
 @app17.route("/2fa")
-def two2fa():
+def twofa():
     if not session.get("authenticated"):
         return redirect(url_for("index17"))
 
