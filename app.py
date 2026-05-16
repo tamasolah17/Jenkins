@@ -75,8 +75,7 @@ def verify_2fa():
 # -------- PROTECTED ROUTE EXAMPLE --------
 @app17.route("/")
 def index():
-    if not session.get("2fa_passed"):
-        return jsonify({"message": "2FA required"}), 401
+
 
     if app17.config.get("TESTING"):
         return render_template("index17.html")
