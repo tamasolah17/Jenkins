@@ -23,7 +23,7 @@ def login():
 
     # login OK -> 2FA indítás
     session["authenticated"] = True
-    return jsonify({"message": "Login OK, go to /2fa/setup"})
+    return redirect(url_for("twofa"))
 
 
 # -------- 2FA SETUP (QR) --------
@@ -48,7 +48,12 @@ def setup_2fa():
 
     return send_file(buf, mimetype="image/png")
 
+@app17.route("/2fa")
+def two2fa():
+    if not session.get("authenticated"):
+        return redirect(url_for("index17"))
 
+    return render_template("2fa.html")
 # -------- 2FA VERIFY --------
 @app17.route("/2fa/verify", methods=["POST"])
 def verify_2fa():
