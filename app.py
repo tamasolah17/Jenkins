@@ -2,16 +2,23 @@ import io
 from flask import Flask, request, jsonify, render_template, session, send_file, redirect, url_for
 import pyotp
 import qrcode
+import io
+import os
+import stripe
 
 app17 = Flask(__name__)
 
 # session kulcshoz kötelező
-app17.secret_key = "dev-secret-change-me"
+app17.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-change-me")
+
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 
 # -------- LOGIN --------
+# -------- LOGIN --------
 @app17.route("/login", methods=["POST"])
 def login():
+
     username = request.form.get("username", "")
     password = request.form.get("password", "")
 
@@ -21,9 +28,38 @@ def login():
     if not any(c in "%!@#$" for c in password):
         return jsonify({"message": "Password must contain special character"}), 400
 
-    # login OK -> 2FA indítás
+    # login successful
     session["authenticated"] = True
-    return redirect(url_for("twofa"))
+
+    try:
+
+        checkout_session = stripe.checkout.Session.create(
+
+            payment_method_types=["card"],
+
+            line_items=[
+                {
+                    "price_data": {
+                        "currency": "usd",
+                        "product_data": {
+                            "name": "Premium Access",
+                        },
+                        "unit_amount": 500,
+                    },
+                    "quantity": 1,
+                }
+            ],
+
+            mode="payment",
+
+            success_url="http://54.211.101.220/success",
+            cancel_url="http://54.211.101.220/cancel",
+        )
+
+        return redirect(checkout_session.url)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # -------- 2FA SETUP (QR) --------
@@ -71,7 +107,18 @@ def verify_2fa():
     else:
         return jsonify({"message": "Invalid code"}), 400
 
+# -------- STRIPE SUCCESS --------
+@app17.route("/success")
+def success():
 
+    # after successful payment continue to 2FA
+    return redirect(url_for("twofa"))
+
+
+# -------- STRIPE CANCEL --------
+@app17.route("/cancel")
+def cancel():
+    return "Payment Cancelled"
 # -------- PROTECTED ROUTE EXAMPLE --------
 @app17.route("/")
 def index():
