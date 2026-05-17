@@ -3,48 +3,46 @@ pipeline {
 
     stages {
 
-        stage('Setup Python') {
+        stage('Clone Check') {
             steps {
-                bat '''
-                    python -m venv venv
+                sh 'ls -la'
+            }
+        }
 
-                    call venv\\Scripts\\activate
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
 
+                    python3 -m pip install --upgrade pip
                     pip install -r requirements.txt
                 '''
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Test') {
             steps {
-                bat '''
-                    call venv\\Scripts\\activate
+                sh '''
+                    . venv/bin/activate
 
+                    python3 -m py_compile Jenkins.py
                     pytest
                 '''
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Deploy to EC2') {
             steps {
-                bat 'docker build -t flask-cicd .'
-            }
-        }
-
-        stage('Deploy Container') {
-            steps {
-                bat '''
-                    docker stop flask-cicd-container
-
-                    docker rm flask-cicd-container
-
-                    docker run -d ^
-                        --name flask-cicd-container ^
-                        -p 24000:24000 ^
-                        flask-cicd
+                sh '''
+                    ssh -i ~/.ssh/jenkins_key \
+                    -o StrictHostKeyChecking=no ubuntu@13.62.225.65 "
+                        cd /home/ubuntu/Jenkins && \
+                        git pull origin main && \
+                        sudo systemctl restart flaskapp
+                    "
                 '''
             }
         }
-
     }
 }
