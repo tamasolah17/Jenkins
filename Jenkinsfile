@@ -32,17 +32,11 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
+                sh '''
+                echo "Deploying via Git pull on EC2..."
 
-                sshagent(credentials: ['ec2-key']) {
-
-                    sh '''
-                    ssh -o StrictHostKeyChecking=no ubuntu@13.62.225.65 "
-                        cd /home/ubuntu/Jenkins &&
-                        git pull origin main &&
-                        sudo systemctl restart flaskapp
-                    "
-                    '''
-                }
+                curl -X POST http://13.62.225.65:5000/deploy-hook || true
+                '''
             }
         }
     }
