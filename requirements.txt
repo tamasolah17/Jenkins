@@ -5,5 +5,3 @@ pyotp
 qrcode[pil]
 pillow
 stripe
-os
-io
