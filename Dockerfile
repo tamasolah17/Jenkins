@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir PyJWT
 COPY . .
 
 # 6. Expose Flask port
-EXPOSE 24000
+EXPOSE 9000
 
 # 7. Start the webhook server (NOT Invoice.py)
 CMD ["gunicorn", "-b", "0.0.0.0:24000", "app:app17"]
