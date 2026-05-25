@@ -5,13 +5,25 @@ import qrcode
 import io
 import os
 import stripe
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from models import db, User, LoginLog
+
+
 
 app17 = Flask(__name__)
 
-# session kulcshoz kötelező
 app17.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-change-me")
 
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+# ✅ DATABASE CONFIG (THIS WAS MISSING)
+app17.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
+app17.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db.init_app(app17)
+migrate = Migrate(app17, db)
+
+
+stripe.api_key = "sk_test_51SYGVPEg9EarudRIP7y58GzMmAIi08AaJwC7Kcin1CPC188ZLjVqkGCvKGzRk1jUdrprcVJNhJbq4uzgyh3RrGdI00crPRc5MO"
 
 
 # -------- LOGIN --------
@@ -21,14 +33,60 @@ def login():
 
     username = request.form.get("username", "")
     password = request.form.get("password", "")
+    ip = request.remote_addr
+    user_agent = request.headers.get("User-Agent")
 
     if len(username) < 4 or len(password) < 4:
+        log = LoginLog(
+            username=username,
+            ip_address=ip,
+            user_agent=user_agent,
+            successful=False
+        )
+
+        db.session.add(log)
+        db.session.commit()
+
         return jsonify({"message": "Too short credentials"}), 400
 
     if not any(c in "%!@#$" for c in password):
+        log = LoginLog(
+            username=username,
+            ip_address=ip,
+            user_agent=user_agent,
+            successful=False
+        )
+
+        db.session.add(log)
+        db.session.commit()
+
         return jsonify({"message": "Password must contain special character"}), 400
 
+
+
     # login successful
+    # check if user already exists
+    existing_user = User.query.filter_by(username=username).first()
+
+    if existing_user:
+        return jsonify({"message": "User already exists"}), 400
+
+    # hash password
+    from werkzeug.security import generate_password_hash
+
+    hashed_password = generate_password_hash(password)
+
+    # create user
+    new_user = User(
+        username=username,
+        password=hashed_password
+    )
+
+    # save to database
+    db.session.add(new_user)
+    db.session.commit()
+
+    # session login
     session["authenticated"] = True
 
     try:
@@ -87,7 +145,7 @@ def setup_2fa():
 @app17.route("/2fa")
 def twofa():
     if not session.get("authenticated"):
-        return redirect(url_for("index17"))
+        return redirect(url_for("index"))
 
     return render_template("2fa.html")
 # -------- 2FA VERIFY --------
@@ -130,4 +188,4 @@ def index():
 
 
 if __name__ == "__main__":
-    app17.run(host="0.0.0.0", port=24000)
+    app17.run(host="0.0.0.0", port=9000)
