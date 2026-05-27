@@ -30,18 +30,20 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to EC2') {
             steps {
-                sh '''
-                ssh -i keys.pem ubuntu@13.60.182.62 "
-                    cd ~/Jenkins &&
-                    git pull &&
-                    docker stop qr-container || true &&
-                    docker rm qr-container || true &&
-                    docker build -t qr . &&
-                    docker run -d --name qr-container -p 9000:9000 qr
-                "
-                '''
+                sshagent(['ec2-key']) {
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no ubuntu@13.60.182.62 "
+                        cd ~/Jenkins &&
+                        git pull &&
+                        docker stop qr-container || true &&
+                        docker rm qr-container || true &&
+                        docker build -t qr . &&
+                        docker run -d --name qr-container -p 9000:9000 qr
+                    "
+                    '''
+                }
             }
         }
     }
