@@ -33,7 +33,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                ssh -i key.pem ubuntu@13.60.182.62 "
+                ssh -i keys.pem ubuntu@13.60.182.62 "
                     cd ~/Jenkins &&
                     git pull &&
                     docker stop qr-container || true &&
