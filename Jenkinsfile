@@ -35,7 +35,7 @@ pipeline {
                 sh '''
                 echo "Deploying via Git pull on EC2..."
 
-                curl -X POST http://13.62.225.65:5000/deploy-hook || true
+                curl -X POST http://13.62.225.65:9000/deploy-hook || true
                 '''
             }
         }
