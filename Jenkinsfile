@@ -30,12 +30,17 @@ pipeline {
             }
         }
 
-        stage('Deploy to EC2') {
+        stage('Deploy') {
             steps {
                 sh '''
-                echo "Deploying via Git pull on EC2..."
-
-                curl -X POST http://13.62.225.65:9000/deploy-hook || true
+                ssh -i key.pem ubuntu@13.60.182.62 "
+                    cd ~/Jenkins &&
+                    git pull &&
+                    docker stop qr-container || true &&
+                    docker rm qr-container || true &&
+                    docker build -t qr . &&
+                    docker run -d --name qr-container -p 9000:9000 qr
+                "
                 '''
             }
         }
