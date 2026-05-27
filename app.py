@@ -7,7 +7,7 @@ import os
 import stripe
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from models1 import db, User, LoginLog
+from models import db, User, LoginLog
 
 
 
