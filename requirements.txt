@@ -7,3 +7,4 @@ pillow
 stripe
 flask_sqlalchemy
 flask_migrate
+models1
