@@ -191,4 +191,5 @@ if __name__ == "__main__":
     with app17.app_context():
         db.create_all()
     print(os.path.abspath("app.db"))
+    print("lol")
     app17.run(host="0.0.0.0", port=9000)
