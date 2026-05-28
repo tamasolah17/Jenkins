@@ -26,6 +26,8 @@ app17.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app17)
 migrate = Migrate(app17, db)
+with app17.app_context():
+    db.create_all()
 
 
 stripe.api_key = "sk_test_51SYGVPEg9EarudRIP7y58GzMmAIi08AaJwC7Kcin1CPC188ZLjVqkGCvKGzRk1jUdrprcVJNhJbq4uzgyh3RrGdI00crPRc5MO"
@@ -58,7 +60,7 @@ active_sessions = Gauge(
 # -------- LOGIN --------
 @app17.route("/login", methods=["POST"])
 def login():
- with login_latency.time():
+  with login_latency.time():
     username = request.form.get("username", "")
     password = request.form.get("password", "")
     ip = request.remote_addr
