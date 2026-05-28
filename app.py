@@ -8,11 +8,14 @@ import stripe
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from models import db, User, LoginLog
+from prometheus_flask_exporter import PrometheusMetrics
+
+
 
 
 
 app17 = Flask(__name__)
-
+metrics = PrometheusMetrics(app17)
 app17.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-change-me")
 
 # ✅ DATABASE CONFIG (THIS WAS MISSING)
