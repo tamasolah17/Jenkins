@@ -9,6 +9,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from models import db, User, LoginLog
 from prometheus_flask_exporter import PrometheusMetrics
+from prometheus_flask_exporter import PrometheusMetrics
+from prometheus_client import Counter, Histogram, Gauge
 
 
 
@@ -28,18 +30,42 @@ migrate = Migrate(app17, db)
 
 stripe.api_key = "sk_test_51SYGVPEg9EarudRIP7y58GzMmAIi08AaJwC7Kcin1CPC188ZLjVqkGCvKGzRk1jUdrprcVJNhJbq4uzgyh3RrGdI00crPRc5MO"
 
+login_success = Counter(
+    "login_success_total",
+    "Successful logins"
+)
 
+login_failed = Counter(
+    "login_failed_total",
+    "Failed logins"
+)
+
+stripe_failures = Counter(
+    "stripe_failures_total",
+    "Stripe payment failures"
+)
+
+login_latency = Histogram(
+    "login_latency_seconds",
+    "Login request latency"
+)
+
+active_sessions = Gauge(
+    "active_sessions",
+    "Currently active sessions"
+)
 # -------- LOGIN --------
 # -------- LOGIN --------
 @app17.route("/login", methods=["POST"])
 def login():
-
+ with login_latency.time():
     username = request.form.get("username", "")
     password = request.form.get("password", "")
     ip = request.remote_addr
     user_agent = request.headers.get("User-Agent")
 
     if len(username) < 4 or len(password) < 4:
+        login_failed.inc()
         log = LoginLog(
             username=username,
             ip_address=ip,
@@ -53,6 +79,8 @@ def login():
         return jsonify({"message": "Too short credentials"}), 400
 
     if not any(c in "%!@#$" for c in password):
+        login_success.inc()
+        active_sessions.inc()
         log = LoginLog(
             username=username,
             ip_address=ip,
@@ -120,6 +148,7 @@ def login():
         return redirect(checkout_session.url)
 
     except Exception as e:
+        stripe_failures.inc()
         return jsonify({"error": str(e)}), 500
 
 

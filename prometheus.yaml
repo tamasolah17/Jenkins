@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+
+  - job_name: 'flask-auth'
+    static_configs:
+      - targets: ['13.60.182.62:9000']
