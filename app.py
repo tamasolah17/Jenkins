@@ -61,6 +61,10 @@ stripe_failures = Counter(
     "stripe_failures_total",
     "Stripe payment failures"
 )
+stripe_finished = Counter(
+    "stripe_finishes_total",
+    "Stripe payment finish"
+)
 
 # LOGIN LATENCY
 login_latency = Histogram(
@@ -170,10 +174,10 @@ def login():
 
             mode="payment",
 
-            success_url="http://54.211.101.220/success",
-            cancel_url="http://54.211.101.220/cancel",
+            success_url="http://54.211.101.220:9000/success",
+            cancel_url="http://54.211.101.220:9000/cancel",
         )
-
+        stripe_finished.inc()
         return redirect(checkout_session.url)
 
     except Exception as e:
