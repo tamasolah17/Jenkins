@@ -42,25 +42,52 @@ login_failed = Counter(
     "Failed logins"
 )
 
+
+
+# LOGIN ATTEMPTS
+login_attempts = Counter(
+    "login_attempts_total",
+    "Total login attempts"
+)
+
+# FAILED LOGINS
+failed_logins = Counter(
+    "failed_logins_total",
+    "Failed login attempts"
+)
+
+# STRIPE FAILURES
 stripe_failures = Counter(
     "stripe_failures_total",
     "Stripe payment failures"
 )
 
+# LOGIN LATENCY
 login_latency = Histogram(
     "login_latency_seconds",
     "Login request latency"
 )
 
+# ACTIVE SESSIONS
 active_sessions = Gauge(
     "active_sessions",
     "Currently active sessions"
+)
+
+# DB QUERY TIME
+db_query_duration = Histogram(
+    "db_query_duration_seconds",
+    "Database query duration"
 )
 # -------- LOGIN --------
 # -------- LOGIN --------
 @app17.route("/login", methods=["POST"])
 def login():
+
   with login_latency.time():
+    login_attempts.inc()
+
+
     username = request.form.get("username", "")
     password = request.form.get("password", "")
     ip = request.remote_addr
