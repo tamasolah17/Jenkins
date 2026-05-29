@@ -127,26 +127,31 @@ def login():
 
 
 
-    #login successful
-    #check if user already exists
-    from werkzeug.security import check_password_hash
+    # login successful
+    # check if user already exists
+    existing_user = User.query.filter_by(username=username).first()
 
-    user = User.query.filter_by(username=username).first()
+    if existing_user:
+        return jsonify({"message": "User already exists"}), 400
 
-    if not user:
-        login_failed.inc()
-        return jsonify({"message": "User not found"}), 401
+    # hash password
+    from werkzeug.security import generate_password_hash
 
-    if not check_password_hash(user.password, password):
-        login_failed.inc()
-        return jsonify({"message": "Invalid password"}), 401
+    hashed_password = generate_password_hash(password)
 
-    login_success.inc()
-    active_sessions.inc()
+    # create user
+    new_user = User(
+        username=username,
+        password=hashed_password
+    )
 
+    # save to database
+    db.session.add(new_user)
+    db.session.commit()
+
+    # session login
     session["authenticated"] = True
 
-    
     try:
 
         checkout_session = stripe.checkout.Session.create(
