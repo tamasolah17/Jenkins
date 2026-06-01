@@ -250,7 +250,9 @@ def index():
         return render_template("index17.html")
     return render_template("index17.html")
 
-
+@app.route("/health")
+def health():
+    return {"status": "UP"}, 200
 if __name__ == "__main__":
     with app17.app_context():
         db.create_all()

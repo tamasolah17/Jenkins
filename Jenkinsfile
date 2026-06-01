@@ -41,6 +41,16 @@ pipeline {
                         docker rm qr-container || true &&
                         docker build -t qr . &&
                         docker run -d --name qr-container -p 9000:9000 qr
+
+                         echo 'Waiting for application...'
+
+                        for i in {1..30}; do
+                            curl -f http://localhost:9000/health && exit 0
+                            sleep 5
+                        done
+
+                        echo 'Application failed readiness check'
+                        exit 1
                     "
                     '''
                 }
