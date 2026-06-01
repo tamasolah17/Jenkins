@@ -250,7 +250,7 @@ def index():
         return render_template("index17.html")
     return render_template("index17.html")
 
-@app.route("/health")
+@app17.route("/health")
 def health():
     return {"status": "UP"}, 200
 if __name__ == "__main__":
