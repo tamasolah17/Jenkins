@@ -161,37 +161,8 @@ def login():
 
     # session login
     session["authenticated"] = True
+    return  redirect("/success")
 
-    try:
-
-        checkout_session = stripe.checkout.Session.create(
-
-            payment_method_types=["card"],
-
-            line_items=[
-                {
-                    "price_data": {
-                        "currency": "usd",
-                        "product_data": {
-                            "name": "Premium Access",
-                        },
-                        "unit_amount": 500,
-                    },
-                    "quantity": 1,
-                }
-            ],
-
-            mode="payment",
-
-            success_url="http://app.automationclinics.com/success",
-            cancel_url="http://app.automationclinics.com/cancel",
-        )
-        stripe_finished.inc()
-        return redirect(checkout_session.url)
-
-    except Exception as e:
-        stripe_failures.inc()
-        return jsonify({"error": str(e)}), 500
 
 
 
@@ -227,7 +198,11 @@ def stripe_webhook():
 
 
 # -------- STRIPE SUCCESS --------
+@app17.route("/success")
+def success():
 
+    # after successful payment continue to 2FA
+    return "Succesfull payment"
 
 
 # -------- STRIPE CANCEL --------
