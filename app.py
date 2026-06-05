@@ -11,6 +11,7 @@ from models import db, User, LoginLog
 from prometheus_flask_exporter import PrometheusMetrics
 from prometheus_flask_exporter import PrometheusMetrics
 from prometheus_client import Counter, Histogram, Gauge
+from flask_mail import Mail, Message
 
 
 
@@ -191,6 +192,28 @@ def login():
         stripe_failures.inc()
         return jsonify({"error": str(e)}), 500
 
+
+
+
+mail = Mail(app17)
+
+def send_welcome_email(customer_email):
+    msg = Message(
+        subject="Welcome!",
+        sender="thomas.meier@automationclinics.com",
+        recipients=[customer_email]
+    )
+
+    msg.body = """
+Thank you for your purchase.
+
+Your payment was successful and your account is now active.
+
+Regards,
+Automation Clinics
+"""
+
+    mail.send(msg)
 @app17.route("/stripe/webhook", methods=["POST"])
 def stripe_webhook():
 
@@ -267,7 +290,7 @@ def verify_2fa():
 def success():
 
     # after successful payment continue to 2FA
-    return redirect(url_for("twofa"))
+    return "Succesfull payment"
 
 
 # -------- STRIPE CANCEL --------
