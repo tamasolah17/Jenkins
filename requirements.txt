@@ -8,5 +8,6 @@ stripe
 flask_sqlalchemy
 flask_migrate
 prometheus-flask-exporter
+boto3
 
 

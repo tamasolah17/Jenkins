@@ -42,7 +42,15 @@ login_failed = Counter(
     "Failed logins"
 )
 
+email_sent = Counter(
+    "email_sent_total",
+    "Successfully sent emails"
+)
 
+email_failed = Counter(
+    "email_failed_total",
+    "Failed email deliveries"
+)
 
 # LOGIN ATTEMPTS
 login_attempts = Counter(
@@ -183,7 +191,32 @@ def login():
         stripe_failures.inc()
         return jsonify({"error": str(e)}), 500
 
+@app17.route("/stripe/webhook", methods=["POST"])
+def stripe_webhook():
 
+    payload = request.data
+
+    event = stripe.Event.construct_from(
+        request.json,
+        stripe.api_key
+    )
+
+    if event["type"] == "checkout.session.completed":
+
+        customer_email = (
+            event["data"]["object"]
+            .get("customer_details", {})
+            .get("email")
+        )
+
+        try:
+            send_welcome_email(customer_email)
+            email_sent.inc()
+
+        except Exception:
+            email_failed.inc()
+
+    return "", 200
 # -------- 2FA SETUP (QR) --------
 @app17.route("/2fa/setup")
 def setup_2fa():

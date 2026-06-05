@@ -1,0 +1,19 @@
+# email-alerts.yaml
+
+groups:
+- name: email-alerts
+
+  rules:
+
+  - alert: EmailDeliveryFailure
+
+    expr: increase(email_failed_total[5m]) > 0
+
+    for: 1m
+
+    labels:
+      severity: critical
+
+    annotations:
+      summary: Email Delivery Failure Detected
+      description: One or more emails failed during the last 5 minutes.
