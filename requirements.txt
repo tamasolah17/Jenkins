@@ -9,5 +9,6 @@ flask_sqlalchemy
 flask_migrate
 prometheus-flask-exporter
 boto3
+flask_mail
 
 
