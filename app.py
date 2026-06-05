@@ -227,11 +227,7 @@ def stripe_webhook():
 
 
 # -------- STRIPE SUCCESS --------
-@app17.route("/success")
-def success():
 
-    # after successful payment continue to 2FA
-    return "Succesfull payment"
 
 
 # -------- STRIPE CANCEL --------
