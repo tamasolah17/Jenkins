@@ -183,8 +183,8 @@ def login():
 
             mode="payment",
 
-            success_url="http://app.automationclinics.com/",
-            cancel_url="http://app.automationclinics.com/",
+            success_url="http://app.automationclinics.com/success",
+            cancel_url="http://app.automationclinics.com/cancel",
         )
         stripe_finished.inc()
         return redirect(checkout_session.url)
