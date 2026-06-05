@@ -183,11 +183,11 @@ def login():
 
             mode="payment",
 
-            success_url="http://54.211.101.220:9000/success",
-            cancel_url="http://54.211.101.220:9000/cancel",
+            success_url="http://app.automationclinics.com/",
+            cancel_url="http://app.automationclinics.com/",
         )
         stripe_finished.inc()
-        return redirect(success.url)
+        return redirect(checkout_session.url)
 
     except Exception as e:
         stripe_failures.inc()
