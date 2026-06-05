@@ -12,6 +12,7 @@ from prometheus_flask_exporter import PrometheusMetrics
 from prometheus_flask_exporter import PrometheusMetrics
 from prometheus_client import Counter, Histogram, Gauge
 from flask_mail import Mail, Message
+from email_service import send_welcome_email
 
 
 
@@ -186,7 +187,7 @@ def login():
             cancel_url="http://54.211.101.220:9000/cancel",
         )
         stripe_finished.inc()
-        return redirect(checkout_session.url)
+        return redirect(success.url)
 
     except Exception as e:
         stripe_failures.inc()
@@ -195,25 +196,7 @@ def login():
 
 
 
-mail = Mail(app17)
 
-def send_welcome_email(customer_email):
-    msg = Message(
-        subject="Welcome!",
-        sender="thomas.meier@automationclinics.com",
-        recipients=[customer_email]
-    )
-
-    msg.body = """
-Thank you for your purchase.
-
-Your payment was successful and your account is now active.
-
-Regards,
-Automation Clinics
-"""
-
-    mail.send(msg)
 @app17.route("/stripe/webhook", methods=["POST"])
 def stripe_webhook():
 
