@@ -185,7 +185,7 @@ def stripe_webhook():
             .get("customer_details", {})
             .get("email")
         )
-
+        session["customer_email"] = customer_email
         try:
             send_welcome_email(customer_email)
             email_sent.inc()
@@ -201,8 +201,17 @@ def stripe_webhook():
 @app17.route("/success")
 def success():
 
-    # after successful payment continue to 2FA
-    return "Succesfull payment"
+    email = session.get("customer_email")
+
+    if email:
+        try:
+            send_welcome_email(email)
+            email_sent.inc()
+        except Exception as e:
+            email_failed.inc()
+            print(e)
+
+    return "Successful payment"
 
 
 # -------- STRIPE CANCEL --------
