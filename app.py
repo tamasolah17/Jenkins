@@ -25,7 +25,7 @@ email_otps = {}
 app17 = Flask(__name__)
 
 mail = Mail(app17)
-app17.config["MAIL_SERVER"] = "smtp.gmail.com"
+app17.config["MAIL_SERVER"] = "smtp-relay.brevo.com"
 app17.config["MAIL_PORT"] = 587
 app17.config["MAIL_USE_TLS"] = True
 app17.config["MAIL_USERNAME"] = "aa13fb001@smtp-brevo.com"
