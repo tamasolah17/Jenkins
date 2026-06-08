@@ -30,6 +30,7 @@ app17.config["MAIL_PORT"] = 587
 app17.config["MAIL_USE_TLS"] = True
 app17.config["MAIL_USERNAME"] = "aa13fb001@smtp-brevo.com"
 app17.config["MAIL_PASSWORD"] = "xsmtpsib-6f20d26c56c3953808069a4747ecb8eca63509a435a58185cfce89e430b73bfd-LArNFPdHA4R74R2c"
+app17.config["MAIL_DEFAULT_SENDER"] = "aa13fb001@smtp-brevo.com"
 
 mail = Mail(app17)
 metrics = PrometheusMetrics(app17)
