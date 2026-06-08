@@ -13,12 +13,18 @@ from prometheus_flask_exporter import PrometheusMetrics
 from prometheus_client import Counter, Histogram, Gauge
 from flask_mail import Mail, Message
 from email_service import send_welcome_email
+from random import randint
+
+
+email_otps = {}
 
 
 
 
 
 app17 = Flask(__name__)
+
+mail = Mail(app17)
 metrics = PrometheusMetrics(app17)
 app17.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-change-me")
 
@@ -161,13 +167,57 @@ def login():
 
     # session login
     session["authenticated"] = True
-    return  redirect("/success")
+    return  redirect("/email-verification")
 
 
+@app17.route("/email-verification")
+def email_verification():
+    return render_template("email_verification.html")
 
+def send_verification_email(email, otp):
 
+    msg = Message(
+        subject="Your Verification Code",
+        recipients=[email]
+    )
 
+    msg.body = f"Your verification code is: {otp}"
 
+    mail.send(msg)
+@app17.route("/verify-email")
+def verify_email_page():
+    return render_template("verify_email.html")
+@app17.route("/send-otp", methods=["POST"])
+def send_otp():
+
+    email = request.form["email"]
+
+    otp = str(randint(100000, 999999))
+
+    email_otps[email] = otp
+
+    send_verification_email(email, otp)
+
+    session["email"] = email
+
+    return redirect("/verify-email")
+
+@app17.route("/verify-email", methods=["POST"])
+def verify_email():
+
+    entered_otp = request.form["otp"]
+
+    email = session.get("email")
+
+    stored_otp = email_otps.get(email)
+
+    if entered_otp == stored_otp:
+
+        session["email_verified"] = True
+
+        return "Email Verified Successfully"
+
+    return "Invalid OTP", 400
 @app17.route("/stripe/webhook", methods=["POST"])
 def stripe_webhook():
 
