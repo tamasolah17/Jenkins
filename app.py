@@ -25,6 +25,13 @@ email_otps = {}
 app17 = Flask(__name__)
 
 mail = Mail(app17)
+app17.config["MAIL_SERVER"] = "smtp.gmail.com"
+app17.config["MAIL_PORT"] = 587
+app17.config["MAIL_USE_TLS"] = True
+app17.config["MAIL_USERNAME"] = "aa13fb001@smtp-brevo.com"
+app17.config["MAIL_PASSWORD"] = "xsmtpsib-6f20d26c56c3953808069a4747ecb8eca63509a435a58185cfce89e430b73bfd-LArNFPdHA4R74R2c"
+
+mail = Mail(app17)
 metrics = PrometheusMetrics(app17)
 app17.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-change-me")
 
